@@ -11,7 +11,7 @@
     <link href={% static "posts/style.css" %} type="text/css" rel="stylesheet" >
   </head>
   <body>
-    <div class="content">
+    <div id="content">
       {% block content %}
 
       <!-- Dynamic Content area -->
@@ -19,9 +19,9 @@
       {% endblock %}
     </div>
 
-    <div class="sidebar">
-      <!-- <h2>My Blog</h2>
-      <p>This is my Blog.</p> -->
+    <div id="sidebar">
+      <h2>My Blog</h2>
+      <p>This is my Blog.</p>
     </div>
   </body>
 </html>

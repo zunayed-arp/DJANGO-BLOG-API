@@ -9,9 +9,9 @@
 {% block content%}
 
 <h1>My Blog</h1>
-{% for post in posts%}
+{% for post in posts %}
 <h2>
-  <a href="{{post.get_absolute_url}}">{{post.title}}</a>
+  <a href="{% url 'posts:post_detail' post.id %}">{{post.title}}</a>
 </h2>
 <p class="date">
     Published {{ post.publish }} by {{post.author}}
@@ -21,8 +21,8 @@
 
 {{post.body|truncatewords:30|linebreaks}}
 
-{%endfor%} 
+    {%endfor%} 
 
-{% include "pagination.html" with page=page_obj %}
+
 
 {% endblock %}
