@@ -13,10 +13,13 @@ class PostListView(ListView):
 
 
 def post_list(request):
-    posts = Post.published.all()
-    return render(request, "posts/list.html", {"posts": posts})
+    post_list = Post.published.all()
+    #pagination with 3 posts per page
+    # return render(request, "posts/list.html", {"posts": posts})
     # object_list = Post.published.all()
-    # paginator = Paginator(object_list, 3)  # 3 posts in each page
+    paginator = Paginator(post_list, 3)  # 3 posts in each page
+    page_number = request.GET.get('page',1)
+    posts = paginator.page(page_number)
     # page = request.GET.get("page")
     # try:
     #     posts = paginator.page(page)
@@ -26,12 +29,17 @@ def post_list(request):
     # except EmptyPage:
     #     # if page is out of range deliver last page of results
     #     posts = paginator.page(paginator.num_pages)
-    # return render(request, "posts/list.html", {"page": page, "posts": posts})
+    return render(request, "posts/list.html", { "posts": posts})
 
 
-def post_detail(request, id):
+def post_detail(request,year,month,day,post):
     try:
-        post = get_object_or_404(Post, id=id, status=Post.Status.PUBLISHED)
+        post = get_object_or_404(Post,
+                                 status=Post.Status.PUBLISHED,
+                                 slug=post,
+                                 publish__year=year,
+                                 publish__month=month,
+                                 publish__day=day)
     except Post.DoesNotExist:
         raise Http404("No Post found")
     return render(request, "posts/detail.html", {"post": post})
