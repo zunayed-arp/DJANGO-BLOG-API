@@ -9,14 +9,14 @@ User = get_user_model()
 
 class PublishedManager(models.Manager):
     def get_queryset(self):
-        return super(PublishedManager, self).get_queryset().filter(status="published")
+        return super().get_queryset().filter(status=Post.Status.PUBLISHED)
 
 
 class Post(models.Model):
-    STATUS_CHOICES = (
-        ("draft", "Draft"),
-        ("published", "Published"),
-    )
+    class Status(models.TextChoices):
+        DRAFT = "DF", "Draft"
+        PUBLISHED = "PB", "Published"
+
     title = models.CharField(max_length=250)
     slug = models.SlugField(max_length=250, unique_for_date="publish")
     author = models.ForeignKey(
@@ -26,11 +26,15 @@ class Post(models.Model):
     publish = models.DateTimeField(default=timezone.now)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="draft")
+    status = models.CharField(
+        max_length=10, choices=Status.choices, default=Status.DRAFT
+    )
     objects = models.Manager()
-    published=PublishedManager()
+    published = PublishedManager()
+
     class Meta:
-        ordering = ("-publish",)
+        ordering = ["-publish"]
+        indexes = [models.Index(fields=["-publish"])]
 
     def __str__(self):
         return self.title
