@@ -1,3 +1,35 @@
-<h1>
-    share html
-</h1>
+{% extends 'base.html' %}
+
+{% block title %} Share Post {%endblock%}
+
+
+{% block content%}
+
+<h1>{{post}}</h1>
+
+{%if sent %}
+
+<h1>e-mail sent Successfully</h1>
+
+<p class="button"><a href="{% url "posts:post_list" %}">Back to Home</a></p>
+
+{%else %}
+<p><a href="{% url "posts:post_list" %}">Back to Home</a></p>
+    <form method="post">
+        <!-- {%for field in form%}
+
+            <div>
+                {{field.erros}}
+                {{field.label_tag}} {{field}}
+            </div>
+
+        {%endfor%} -->
+
+        {%csrf_token%}
+        {{form.as_p}}
+        <input type="submit" value="Send e-mail">
+    </form>
+
+
+{%endif%}
+{%endblock%}
