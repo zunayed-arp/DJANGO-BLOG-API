@@ -16,18 +16,36 @@ class PostListView(ListView):
     template_name = "posts/list.html"
 
 
+from django.core.mail import send_mail
+
+
 def post_share(request, post_id):
     # retrieve post by id
-    post = get_object_or_404(Post, id=post_id, status=Post.status.PUBLISHED)
+    post = get_object_or_404(Post, id=post_id, status=Post.Status.PUBLISHED)
+    sent = False
+
     if request.method == "POST":
         # Form was submitted
         form = EmailPostForm(request.POST)
         if form.is_valid():
             # form fields passed validation
             cd = form.cleaned_data
-        else:
-            form = EmailPostForm()
-        return render(request, "posts/share.html", {"post": post, "form": form})
+            print(cd)
+            post_url = request.build_absolute_uri(post.get_absolute_url())
+            subject = f"{cd['name']} recommends you read" f"{post.title}"
+            message = (
+                f"Read{post.title} as {post_url}\n\n"
+                f"{cd['name']}\\'s comments: {cd['comments']}"
+            )
+            send_mail(subject, message, "zunayeduapcse@gmail.com", [cd["to"]])
+            sent = True
+    else:
+        form = EmailPostForm()
+        print(form)
+
+    return render(
+        request, "posts/share.html", {"post": post, "form": form, "sent": sent}
+    )
 
 
 def post_list(request):
