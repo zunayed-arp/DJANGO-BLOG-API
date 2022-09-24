@@ -6,6 +6,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.views.generic import ListView
 from django.http import Http404
 from django.views.decorators.http import require_POST
+from taggit.models import Tag
 
 
 @require_POST
@@ -51,8 +52,8 @@ def post_share(request, post_id):
         if form.is_valid():
             # form fields passed validation
             cd = form.cleaned_data
-            print('aa',aa)
-            print('cd',cd)
+            print("aa", aa)
+            print("cd", cd)
             post_url = request.build_absolute_uri(post.get_absolute_url())
             subject = f"{cd['name']} recommends you read" f"{post.title}"
             message = (
@@ -70,8 +71,12 @@ def post_share(request, post_id):
     )
 
 
-def post_list(request):
+def post_list(request, tag_slug=None):
     post_list = Post.published.all()
+    tag = None
+    if tag_slug:
+        tag = get_object_or_404(Tag, slug=tag_slug)
+        post_list = post_list.filter(tags__in=[tag])
     # pagination with 3 posts per page
     paginator = Paginator(post_list, 3)  # 3 posts in each page
     page_number = request.GET.get("page", 1)
@@ -86,7 +91,7 @@ def post_list(request):
     except EmptyPage:
         # if page_number is out of range deliver last page of results
         posts = paginator.page(paginator.num_pages)
-    return render(request, "posts/list.html", {"posts": posts})
+    return render(request, "posts/list.html", {"posts": posts, "tag": tag})
 
 
 def post_detail(request, year, month, day, post):
@@ -99,10 +104,12 @@ def post_detail(request, year, month, day, post):
             publish__month=month,
             publish__day=day,
         )
-        #List of active comments for this post
+        # List of active comments for this post
         comments = post.comments.filter(active=True)
-        #Form for users to comments
+        # Form for users to comments
         form = CommentForm()
     except Post.DoesNotExist:
         raise Http404("No Post found")
-    return render(request, "posts/detail.html", {"post": post,"comments":comments,"form":form})
+    return render(
+        request, "posts/detail.html", {"post": post, "comments": comments, "form": form}
+    )
