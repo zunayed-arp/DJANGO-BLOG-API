@@ -22,6 +22,18 @@
     </a>
 </p>
 
+
+<h2>Similar posts</h2>
+
+{% for post in similar_posts %}
+<p>
+    <a href="{{post.get_absolute_url}}">{{post.title}}</a>
+</p>
+{% empty %}
+There are no similar posts yet.
+{%endfor%}
+
+
 <p><a href="{% url "posts:post_list" %}">Back to Home</a></p>
 
 {% with comments.count as total_comments %}
