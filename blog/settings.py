@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "django_extensions",
     "posts",
+    "taggit",
 ]
 
 REST_FRAMEWORK = {
@@ -91,6 +92,16 @@ DATABASES = {
         "NAME": BASE_DIR / "db.sqlite3",
     }
 }
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'djblog',
+#         'USER': 'postgres',
+#         'PASSWORD': 'postgres',
+#         'HOST': 'localhost',
+#         'PORT': '533',
+#     }
+# }
 
 
 # Password validation
@@ -144,3 +155,13 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
 # AUTH_USER_MODEL = "accounts.CustomUser"
+
+
+# EMAIL SERVER CONFIGURATION
+EMAIL_HOST = "smptp.gmail.com"
+EMAIL_HOST_USER = "zunayeduapcse@gmail.com"
+EMAIL_HOST_PASSWORD = "tspotgypnoatzxip"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
