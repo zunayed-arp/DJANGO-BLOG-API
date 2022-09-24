@@ -1,10 +1,30 @@
 from django.shortcuts import render, get_object_or_404
 
-from posts.forms import EmailPostForm
-from .models import Post
+from posts.forms import EmailPostForm, CommentForm
+from .models import Post, Comment
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.views.generic import ListView
 from django.http import Http404
+from django.views.decorators.http import require_POST
+
+
+@require_POST
+def post_comment(request, post_id):
+    post = get_object_or_404(Post, id=post_id, status=Post.Status.PUBLISHED)
+    comment = None
+    # A comment was posted
+    comment_data = request.POST
+    form = CommentForm(data=comment_data)
+    if form.is_valid():
+        # create a Comment object without saving it to the database
+        comment = form.save(commit=False)
+        # Assign the port to the comment
+        comment.post = post
+        # save the comment to the database
+        comment.save()
+    return render(
+        request, "posts/comment.html", {"post": post, "comment": comment, "form": form}
+    )
 
 
 class PostListView(ListView):
@@ -26,11 +46,13 @@ def post_share(request, post_id):
 
     if request.method == "POST":
         # Form was submitted
+        aa = {}
         form = EmailPostForm(request.POST)
         if form.is_valid():
             # form fields passed validation
             cd = form.cleaned_data
-            print(cd)
+            print('aa',aa)
+            print('cd',cd)
             post_url = request.build_absolute_uri(post.get_absolute_url())
             subject = f"{cd['name']} recommends you read" f"{post.title}"
             message = (
@@ -41,7 +63,7 @@ def post_share(request, post_id):
             sent = True
     else:
         form = EmailPostForm()
-        print(form)
+        # print(form)
 
     return render(
         request, "posts/share.html", {"post": post, "form": form, "sent": sent}
@@ -77,6 +99,10 @@ def post_detail(request, year, month, day, post):
             publish__month=month,
             publish__day=day,
         )
+        #List of active comments for this post
+        comments = post.comments.filter(active=True)
+        #Form for users to comments
+        form = CommentForm()
     except Post.DoesNotExist:
         raise Http404("No Post found")
-    return render(request, "posts/detail.html", {"post": post})
+    return render(request, "posts/detail.html", {"post": post,"comments":comments,"form":form})
