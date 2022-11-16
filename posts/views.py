@@ -30,7 +30,7 @@ def post_comment(request, post_id):
 
 
 class PostListView(ListView):
-    """Alternative post list view"""
+    """Alternative post list view """
 
     queryset = Post.published.all()
     context_object_name = "posts"
